@@ -1,0 +1,30 @@
+.userInfo {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid #dddddd35;
+  .user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    span {
+      font-weight: 500;
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      p {
+        font-weight: 100;
+      }
+    }
+  }
+}

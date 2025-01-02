@@ -1,0 +1,18 @@
+.chatComponent {
+  flex: 3;
+  border-left: 1px solid #dddddd35;
+  border-right: 1px solid #dddddd35;
+
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+  }
+  .info {
+    margin-top: 40vh;
+    align-self: center;
+    justify-self: center;
+    font-size: 20px;
+    opacity: 0.7;
+  }
+}

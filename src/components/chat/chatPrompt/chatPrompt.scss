@@ -1,0 +1,40 @@
+.bottom {
+  padding: 0px 20px;
+
+  form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .emoji {
+      position: relative;
+      cursor: pointer;
+      width: 80%;
+      background-color: black;
+      .messageInput {
+        padding: 20px;
+        border: none;
+        height: auto;
+        width: 80%;
+        background-color: black;
+        color: white;
+        font-size: 18px;
+      }
+      .emojiIcon {
+        position: absolute;
+        top: 15px;
+        right: 50px;
+      }
+      .emojiPicker {
+        position: absolute;
+        bottom: 50px;
+        right: 10px;
+      }
+    }
+    .sendButton {
+      border: none;
+      background-color: skyblue;
+      padding: 15px;
+      cursor: pointer;
+    }
+  }
+}

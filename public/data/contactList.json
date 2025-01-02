@@ -1,0 +1,25 @@
+[{
+        "id": "contact-1",
+        "name": "Bob1",
+        "img": "/images/friend.png",
+        "status": "Available",
+        "chatId": "chat-1"
+
+    },
+    {
+        "id": "contact-2",
+        "name": "Bob2",
+        "img": "/images/friend.png",
+        "status": "Available",
+        "chatId": "chat-2"
+
+    },
+    {
+        "id": "contact-3",
+        "name": "Bob3",
+        "img": "/images/friend.png",
+        "status": "Available",
+        "chatId": "chat-3"
+
+    }
+]

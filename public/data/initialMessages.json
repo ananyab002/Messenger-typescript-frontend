@@ -1,0 +1,112 @@
+{
+    "chat-1": [{
+            "id": "contact-1",
+            "message": "Hello Kevin!",
+            "time": "08:30 AM",
+            "date": "2024-08-10",
+            "msgId": 1
+        },
+        {
+            "id": 1,
+            "message": "Hi Bob. Its been so long. How is it going?",
+            "time": "08:31 AM",
+            "date": "2024-08-10",
+            "msgId": 2
+        },
+        {
+            "id": "contact-1",
+            "message": "I know, right? Time flies. I’ve been good, just busy with work and life. What about you? How’s everything going?",
+            "time": "09:00 AM",
+            "date": "2024-08-10",
+            "msgId": 3
+        },
+        {
+            "id": 1,
+            "message": "Same here. It’s been a whirlwind—work, family, trying to squeeze in some me-time. But I’ve missed you! We used to be inseparable.",
+            "time": "10:00 AM",
+            "date": "2024-08-10",
+            "msgId": 4
+        },
+        {
+            "id": "contact-1",
+            "message": "I’ve missed you too! Remember those late-night talks and spontaneous road trips? We should definitely plan something like that again.",
+            "time": "12:00 PM",
+            "date": "2024-08-10",
+            "msgId": 5
+        },
+        {
+            "id": 1,
+            "message": "Absolutely! We’ve got so much to catch up on. How’s your family? And what’s new with work?",
+            "time": "12:01 PM",
+            "date": "2024-08-10",
+            "msgId": 6
+        }
+    ],
+    "chat-2": [{
+            "id": "contact-2",
+            "message": "Hello Kevin!",
+            "time": "08:30 AM",
+            "date": "2024-08-10",
+            "msgId": 7
+        },
+        {
+            "id": 1,
+            "message": "Hi Bob. Its been so long. How is it going?",
+            "time": "08:31 AM",
+            "date": "2024-08-10",
+            "msgId": 8
+        },
+        {
+            "id": "contact-2",
+            "message": "I know, right? Time flies. I’ve been good, just busy with work and life. What about you? How’s everything going?",
+            "time": "09:00 AM",
+            "date": "2024-08-10",
+            "msgId": 9
+        },
+        {
+            "id": 1,
+            "message": "Same here. It’s been a whirlwind—work, family, trying to squeeze in some me-time. But I’ve missed you! We used to be inseparable.",
+            "time": "10:00 AM",
+            "date": "2024-08-10",
+            "msgId": 10
+        },
+        {
+            "id": "contact-2",
+            "message": "I’ve missed you too! Remember those late-night talks and spontaneous road trips? We should definitely plan something like that again.",
+            "time": "12:00 PM",
+            "date": "2024-08-10",
+            "msgId": 11
+        }
+    ],
+    "chat-3": [{
+            "id": "contact-3",
+            "message": "Hello Kevin!",
+            "time": "08:30 AM",
+            "date": "2024-08-10",
+            "msgId": 12
+        },
+        {
+            "id": 1,
+            "message": "Hi Bob. Its been so long. How is it going?",
+            "time": "08:31 AM",
+            "date": "2024-08-10",
+            "msgId": 13
+        },
+        {
+            "id": "contact-3",
+            "message": "I know, right? Time flies. I’ve been good, just busy with work and life. What about you? How’s everything going?",
+            "time": "09:00 AM",
+            "date": "2024-08-10",
+            "msgId": 14
+        },
+        {
+            "id": 1,
+            "message": "Same here. It’s been a whirlwind—work, family, trying to squeeze in some me-time. But I’ve missed you! We used to be inseparable.",
+            "time": "10:00 AM",
+            "date": "2024-08-10",
+            "msgId": 15
+        }
+
+    ]
+
+}
