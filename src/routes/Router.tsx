@@ -6,8 +6,6 @@ import Chat from "../components/chat/Chat";
 
 
 function Router() {
-
-  const BASEURL = "";
   const router = createBrowserRouter([
     {
       path: "/Messenger-typescript-frontend/",
