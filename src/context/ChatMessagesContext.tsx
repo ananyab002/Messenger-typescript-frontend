@@ -31,7 +31,7 @@ export const ChatMessagesContextProvider = ({ children }: Props) => {
     console.log("fetchInitialMessages");
     try {
       const response = await fetch(
-        "/data/initialMessages.json"
+        "https://ananyab002.github.io/Messenger-typescript-frontend/data/initialMessages.json"
       );
       if (!response.ok) throw new Error("Failed to fetch messages");
       const data = await response.json();

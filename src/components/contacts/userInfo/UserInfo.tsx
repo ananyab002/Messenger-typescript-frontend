@@ -15,7 +15,7 @@ const UserInfo = () => {
 
   const fetchUserInfo = async () => {
     const response = await fetch(
-      "/data/user.json"
+      "https://ananyab002.github.io/Messenger-typescript-frontend/data/user.json"
     );
     const userData = await response.json();
     setUserInfo(userData);

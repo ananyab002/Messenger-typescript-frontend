@@ -7,19 +7,19 @@ import Chat from "../components/chat/Chat";
 function Router() {
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: "/Messenger-typescript-frontend/",
       element: <LoginPage />,
     },
     {
-      path: "/register",
+      path: "/Messenger-typescript-frontend/register",
       element: <RegisterPage />,
     },
     {
-      path: "/messenger",
+      path: "/Messenger-typescript-frontend/messenger",
       element: <HomePage />,
       children: [
         {
-          path: "/messenger/:chatID",
+          path: "/Messenger-typescript-frontend/messenger/:chatID",
           element: <Chat />,
         },
       ],

@@ -21,7 +21,7 @@ const ContactList = () => {
 
   const fetchContactList = async () => {
     const response = await fetch(
-      "/data/contactList.json"
+      "https://ananyab002.github.io/Messenger-typescript-frontend/data/contactList.json"
     );
     const contactsData: ContactListType[] = await response.json();
     setcontactList(contactsData);

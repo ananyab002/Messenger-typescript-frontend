@@ -1,6 +1,6 @@
 {
     "id": 1,
     "name": "Kevin",
-    "img": "/images/user.png",
+    "img": "https://ananyab002.github.io/Messenger-typescript-frontend/images/user.png",
     "status": "Available"
 }
