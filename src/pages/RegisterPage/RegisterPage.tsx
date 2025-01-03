@@ -95,7 +95,7 @@ const RegisterPage = () => {
               rules={{ required: "Date is required" }}
               name="dob"
               control={control}
-              defaultValue={null}
+              defaultValue={undefined}
               render={({ field }) => (
                 <DatePicker selected={field.value}
                   onChange={(date) => field.onChange(date)}
