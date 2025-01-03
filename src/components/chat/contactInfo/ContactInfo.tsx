@@ -24,7 +24,7 @@ const ContactInfo = () => {
     queryFn: async () => {
       if (!chatID) return null; // Return null if chatID is not provided
 
-      const response = await fetch("/data/contactList.json");
+      const response = await fetch("https://ananyab002.github.io/Messenger-typescript-frontend/data/contactList.json");
       if (!response.ok) {
         throw new Error("Failed to fetch contact information.");
       }
