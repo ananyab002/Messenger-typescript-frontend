@@ -21,7 +21,7 @@ const LoginPage = () => {
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     await delay(1000);
     console.log(data);
-    navigate("/messenger")
+    navigate("/Messenger-typescript-frontend/messenger")
   }
 
   return (
@@ -46,7 +46,7 @@ const LoginPage = () => {
             <button>{isSubmitting ? "Please Wait......" : "Login"}</button>
             <p>
               Do not have an account ? Please regiter{" "}
-              <Link to="/register">here</Link>
+              <Link to="/Messenger-typescript-frontend/register">here</Link>
             </p>
           </div>
         </form>

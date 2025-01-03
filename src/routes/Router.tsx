@@ -4,7 +4,10 @@ import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import HomePage from "../pages/HomePage/HomePage"
 import Chat from "../components/chat/Chat";
 
+
 function Router() {
+
+  const BASEURL = "";
   const router = createBrowserRouter([
     {
       path: "/Messenger-typescript-frontend/",

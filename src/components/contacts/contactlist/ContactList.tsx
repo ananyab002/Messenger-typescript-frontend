@@ -38,7 +38,7 @@ const ContactList = () => {
       await fetchInitialMessages(chatId);
       setSelectedContactId(contactId);
       console.log(selectedContactId);
-      navigate(`/messenger/` + chatId);
+      navigate(`/Messenger-typescript-frontend/messenger/` + chatId);
     } catch (error) {
       console.log(error);
     }
