@@ -1,0 +1,73 @@
+.addContacts {
+  width: 400px;
+  height: max-content;
+  padding: 30px;
+  background-color: #121212;
+  position: fixed; /* Use fixed for consistent placement */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the dialog */
+  z-index: 1001; /* Ensure it's above the overlay */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add some depth */
+  border-radius: 10px;
+  h3 {
+    text-align: center;
+  }
+  form {
+    display: flex;
+    gap: 20px;
+    input {
+      align-self: center;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      width: 90%;
+    }
+  }
+  .searchList {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid gray;
+    .user {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+
+      img {
+        width: 40px;
+        height: 40px;
+      }
+      .details {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px;
+        .userName {
+          font-size: 20px;
+        }
+        p {
+          margin: 0;
+        }
+      }
+    }
+    button {
+      width: 80px;
+      height: 40px;
+      border: none;
+      border-radius: 10px;
+      background-color: lightgreen;
+    }
+  }
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(52, 48, 48, 0.5); /* Semi-transparent black */
+  z-index: 1000; /* Below the dialog but above everything else */
+  backdrop-filter: blur(5px);
+}

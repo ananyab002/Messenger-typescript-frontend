@@ -2,35 +2,29 @@ import { useContext, useEffect, useState } from "react";
 import { ChatMessagesContext, ChatMessagesContextType } from "../../../context/ChatMessagesContext";
 import "./contactList.scss";
 import { useNavigate } from "react-router-dom";
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import SearchIcon from '@mui/icons-material/Search';
+import AddContact from "./addContact/AddContact";
+import { useFetchContactList } from "../../../hooks/useFetchContactList";
+import { ContactListType } from "../../../types/type";
 
 /**
  * Fetches contact list data from a JSON file and updates state.
  */
-interface ContactListType {
-  id: string,
-  name: string,
-  img: string,
-  status: string,
-  chatId: string
-}
+
 const ContactList = () => {
   const { fetchInitialMessages } = useContext<ChatMessagesContextType>(ChatMessagesContext);
-  const [contactList, setcontactList] = useState<ContactListType[] | []>([]);
+  const { contactList, fetchContactList, setcontactList } = useFetchContactList();
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState<string>();
+  const [addContactDialog, setAddContactDialog] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const fetchContactList = async () => {
-    const response = await fetch(
-      "https://ananyab002.github.io/Messenger-typescript-frontend/data/contactList.json"
-    );
-    const contactsData: ContactListType[] = await response.json();
-    setcontactList(contactsData);
-    console.log(contactsData)
-  };
+  console.log(contactList);
 
   useEffect(() => {
     fetchContactList();
-  }, []);
+  }, [])
 
   const getMessages = async (contactId: string, chatId: string) => {
     try {
@@ -39,31 +33,59 @@ const ContactList = () => {
       setSelectedContactId(contactId);
       console.log(selectedContactId);
       navigate(`/Messenger-typescript-frontend/messenger/` + chatId);
+
     } catch (error) {
       console.log(error);
     }
   };
+
+
+  const handleSearch = () => {
+    const searchContactList = contactList.filter(item => searchText && item.name.toLowerCase().includes(searchText.toLowerCase()));
+    if (searchContactList) {
+      const remainingContactList = contactList.filter(item => item.id !== searchContactList[0].id);
+      const updatedContactList = [...searchContactList, ...remainingContactList];
+      setcontactList(updatedContactList);
+      setSelectedContactId(searchContactList[0].id);
+      getMessages(searchContactList[0].id, searchContactList[0].chatId);
+    }
+    console.log(searchContactList);
+  }
+
+  const handleAddContactDialog = (contactData: ContactListType[]) => {
+    //setcontactList(prev => [...prev, ...contactData]);
+    setAddContactDialog(false);
+    fetchContactList(contactData);
+  }
+
   return (
     <div className="contactList">
-      <p>Friends</p>
+      <div className="addSearchContacts">
+        <input type="text" placeholder="Add or search"
+          onChange={(e) => setSearchText(e.target.value)} />
+        <div className="search">
+          <SearchIcon className="searchContact" onClick={handleSearch} />
+          <AddBoxIcon className="addContact" onClick={() => setAddContactDialog(true)} />
+        </div>
+      </div>
       <div className="list">
         {contactList.map((contact) => (
           <div
-            key={contact.id}
-            className={`user ${selectedContactId === contact.id ? "selected" : ""
+            className={`user ${selectedContactId === contact.contactId ? "selected" : ""
               }`}
-            onClick={() => getMessages(contact.id, contact.chatId)}
+            onClick={() => getMessages(contact.contactId, contact.chatId)}
             style={{
-              pointerEvents: selectedContactId === contact.id ? "none" : "auto",
+              pointerEvents: selectedContactId === contact.contactId ? "none" : "auto",
             }}
           >
-            <img src={contact.img} alt="" />
+            <img src={contact.image} alt="" />
             <div className="text">
-              <span>{contact.name}</span>
+              <span>{contact.contactName}</span>
             </div>
           </div>
         ))}
       </div>
+      {addContactDialog && <AddContact onClickAddContactDialog={handleAddContactDialog} />}
     </div>
   );
 };

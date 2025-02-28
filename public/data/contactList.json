@@ -1,23 +1,23 @@
 [{
-        "id": "contact-1",
-        "name": "Bob1",
-        "img": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
+        "contactId": "contact-1",
+        "contactName": "Bob1",
+        "image": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
         "status": "Available",
         "chatId": "chat-1"
 
     },
     {
-        "id": "contact-2",
-        "name": "Bob2",
-        "img": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
+        "contactId": "contact-2",
+        "contactName": "Bob2",
+        "image": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
         "status": "Available",
         "chatId": "chat-2"
 
     },
     {
-        "id": "contact-3",
-        "name": "Bob3",
-        "img": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
+        "contactId": "contact-3",
+        "contactName": "Bob3",
+        "image": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
         "status": "Available",
         "chatId": "chat-3"
 

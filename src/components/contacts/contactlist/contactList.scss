@@ -1,6 +1,32 @@
 .contactList {
-  p {
-    padding: 10px;
+  .addSearchContacts {
+    display: flex;
+    align-items: center;
+    // justify-content: space-between;
+    margin: 10px;
+    input {
+      background-color: black;
+      padding: 15px;
+      width: 70%;
+      border: none;
+      color: white;
+      font-size: 15px;
+      border-radius: 10px;
+    }
+    .search {
+      display: flex;
+      align-items: center;
+
+      .searchContact {
+        padding: 10px;
+        font-size: 30px;
+      }
+      .addContact {
+        color: rgb(47, 255, 175);
+        padding: 10px;
+        font-size: 30px;
+      }
+    }
   }
   .list {
     display: flex;
@@ -44,4 +70,8 @@
       background-color: #222;
     }
   }
+}
+input:focus {
+  outline: none; /* Removes the default focus outline */
+  border: none; /* Removes the border */
 }

@@ -1,27 +1,18 @@
 import { useForm } from "react-hook-form";
 import "./loginPage.scss";
 import { Link, useNavigate } from "react-router-dom";
+import { LoginDataType } from "../../types/type";
+import { useLogin } from "../../context/AuthContext";
 
-
-interface LoginData {
-  email: string,
-  password: string,
-  confirmPass: string,
-  dob: Date,
-  gender: string,
-  country: string,
-
-}
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { loginCurrentUser, loginError } = useLogin();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginDataType>();
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginData>();
+  const onSubmit = async (data: LoginDataType) => {
+    await loginCurrentUser(data);
+    navigate("/Messenger-typescript-frontend/messenger");
 
-  const onSubmit = async (data: LoginData) => {
-    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    await delay(1000);
-    console.log(data);
-    navigate("/Messenger-typescript-frontend/messenger")
   }
 
   return (
@@ -44,6 +35,7 @@ const LoginPage = () => {
             {errors.password && <div>{errors.password.message}</div>}
 
             <button>{isSubmitting ? "Please Wait......" : "Login"}</button>
+            {loginError && <div style={{ color: "red" }}>{loginError}</div>}
             <p>
               Do not have an account ? Please regiter{" "}
               <Link to="/Messenger-typescript-frontend/register">here</Link>

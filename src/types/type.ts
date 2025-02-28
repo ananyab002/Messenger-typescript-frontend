@@ -18,3 +18,31 @@ export interface RepliedToMessageType{
   msgId: number,
   message:string
 }
+
+
+export interface LoginDataType {
+  userId:number,
+  email: string,
+  password: string,
+  confirmPass: string,
+  dob: Date,
+  gender: string,
+  country: string,
+
+}
+
+export interface ContactListType {
+  contactId: string,
+  contactName: string,
+  image: string,
+  status: string,
+  chatId: string
+}
+
+export interface SearchResultType {
+    userId: string,
+    image: string,
+    name: string,
+    email: string,
+    phoneNumber: string
+}
