@@ -21,5 +21,22 @@
         "status": "Available",
         "chatId": "chat-3"
 
+    },
+        {
+        "contactId": "contact-4",
+        "contactName": "Bob3",
+        "image": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
+        "status": "Available",
+        "chatId": "chat-3"
+
+    },
+        {
+        "contactId": "contact-5",
+        "contactName": "Bob3",
+        "image": "https://ananyab002.github.io/Messenger-typescript-frontend/images/friend.png",
+        "status": "Available",
+        "chatId": "chat-3"
+
     }
+
 ]
