@@ -16,6 +16,7 @@ export const useFetchContactList = () => {
                 "https://ananyab002.github.io/Messenger-typescript-frontend/data/contactList.json"
             );
 
+            console.log(response.data)
             return response.data;
 
         } catch (error) {
