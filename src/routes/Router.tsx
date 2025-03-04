@@ -3,6 +3,7 @@ import LoginPage from "../pages/LoginPage/LoginPage";
 import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import HomePage from "../pages/HomePage/HomePage"
 import Chat from "../components/chat/Chat";
+import ProtectedLayout from "../protectedLayout";
 
 
 function Router() {
@@ -17,14 +18,20 @@ function Router() {
     },
     {
       path: "/Messenger-typescript-frontend/messenger",
-      element: <HomePage />,
+      element: <ProtectedLayout />, // Wrap protected routes
       children: [
         {
-          path: "/Messenger-typescript-frontend/messenger/:chatID",
-          element: <Chat />,
+          path: "/Messenger-typescript-frontend/messenger",
+          element: <HomePage />,
+          children: [
+            {
+              path: "/Messenger-typescript-frontend/messenger/:chatID",
+              element: <Chat />,
+            },
+          ],
         },
-      ],
-    },
+      ]
+    }
   ]);
   return <RouterProvider router={router}></RouterProvider>;
 }

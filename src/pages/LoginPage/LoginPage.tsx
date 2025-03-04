@@ -1,18 +1,29 @@
 import { useForm } from "react-hook-form";
 import "./loginPage.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LoginDataType } from "../../types/type";
-import { useLogin } from "../../context/AuthContext";
+
+import { useEffect, useState } from "react";
+import { useLogin } from "../../hooks/useLogin";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { loginCurrentUser, loginError } = useLogin();
+  const [error, setError] = useState('');
+  const location = useLocation();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginDataType>();
 
-  const onSubmit = async (data: LoginDataType) => {
-    await loginCurrentUser(data);
-    navigate("/Messenger-typescript-frontend/messenger");
+  useEffect(() => {
+    if (location.state?.authError) {
+      setError(location.state.authError);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
+  const onSubmit = async (data: LoginDataType) => {
+    const response = await loginCurrentUser(data);
+    if (response?.success)
+      navigate("/Messenger-typescript-frontend/messenger");
   }
 
   return (
@@ -36,6 +47,11 @@ const LoginPage = () => {
 
             <button>{isSubmitting ? "Please Wait......" : "Login"}</button>
             {loginError && <div style={{ color: "red" }}>{loginError}</div>}
+            {error && (
+              <div style={{ color: "red" }}>
+                {error}
+              </div>
+            )}
             <p>
               Do not have an account ? Please regiter{" "}
               <Link to="/Messenger-typescript-frontend/register">here</Link>

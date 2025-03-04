@@ -14,7 +14,7 @@ import { ContactListType } from "../../../types/type";
 
 const ContactList = () => {
   const { fetchInitialMessages } = useContext<ChatMessagesContextType>(ChatMessagesContext);
-  const { contactList, fetchContactList, setcontactList } = useFetchContactList();
+  const { contactList, fetchContactList, updateContactList } = useFetchContactList();
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [searchText, setSearchText] = useState<string>();
   const [addContactDialog, setAddContactDialog] = useState<boolean>(false);
@@ -24,7 +24,7 @@ const ContactList = () => {
 
   useEffect(() => {
     fetchContactList();
-  }, [])
+  }, [fetchContactList])
 
   const getMessages = async (contactId: string, chatId: string) => {
     try {
@@ -41,21 +41,24 @@ const ContactList = () => {
 
 
   const handleSearch = () => {
-    const searchContactList = contactList.filter(item => searchText && item.name.toLowerCase().includes(searchText.toLowerCase()));
+    const searchContactList = contactList.filter(item => searchText && item.contactName.toLowerCase().includes(searchText.toLowerCase()));
     if (searchContactList) {
-      const remainingContactList = contactList.filter(item => item.id !== searchContactList[0].id);
+      const remainingContactList = contactList.filter(item => item.contactId !== searchContactList[0].contactId);
       const updatedContactList = [...searchContactList, ...remainingContactList];
-      setcontactList(updatedContactList);
-      setSelectedContactId(searchContactList[0].id);
-      getMessages(searchContactList[0].id, searchContactList[0].chatId);
+      updateContactList(updatedContactList);
+      setSelectedContactId(searchContactList[0].contactId);
+      getMessages(searchContactList[0].contactId, searchContactList[0].chatId);
     }
     console.log(searchContactList);
   }
 
-  const handleAddContactDialog = (contactData: ContactListType[]) => {
-    //setcontactList(prev => [...prev, ...contactData]);
+  const handleAddContactDialog = (contactData?: ContactListType) => {
+    if (contactData) {
+      const allContactsData = [contactData, ...contactList];
+      updateContactList(allContactsData);
+    }
     setAddContactDialog(false);
-    fetchContactList(contactData);
+
   }
 
   return (
@@ -71,6 +74,7 @@ const ContactList = () => {
       <div className="list">
         {contactList.map((contact) => (
           <div
+            key={contact.contactId}
             className={`user ${selectedContactId === contact.contactId ? "selected" : ""
               }`}
             onClick={() => getMessages(contact.contactId, contact.chatId)}

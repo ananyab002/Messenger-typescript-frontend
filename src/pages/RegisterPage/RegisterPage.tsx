@@ -2,9 +2,10 @@ import "./registerpage.scss";
 import { Controller, useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/globalApi";
 
 interface RegisterFormData {
   email: string;
@@ -26,19 +27,18 @@ const RegisterPage = () => {
 
   const [countries, setCountries] = useState<CountryData>({});
 
-  const getCountryData = async () => {
-    const request = await fetch(
+  const getCountryData = useCallback(async () => {
+    const response = await api.get(
       "https://ananyab002.github.io/Messenger-typescript-frontend/data/country.json"
     );
-    const countriesdata = await request.json();
-    console.log(countriesdata);
-    setCountries(countriesdata);
+    console.log(response.data);
+    setCountries(response.data);
     console.log(countries);
-  };
+  }, [countries]);
 
   useEffect(() => {
     getCountryData();
-  }, []);
+  }, [getCountryData]);
 
   const {
     register,
@@ -53,18 +53,14 @@ const RegisterPage = () => {
     try {
       console.log(data);
       //http://127.0.0.1:8000/users/register  //for python backend
-      const response = await fetch("http://localhost:8080/auth/register", {
-        method: "POST",
+      const response = await api.post("auth/register", data, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
       });
-
-      const responseMessage = await response.json();
-      console.log(responseMessage);
+      console.log(response.data);
       if (response.status === 409) {
-        setError("root", { type: "manual", message: responseMessage.message });
+        setError("root", { type: "manual", message: response.data.message });
         return false;
       }
       navigate("/Messenger-typescript-frontend/");

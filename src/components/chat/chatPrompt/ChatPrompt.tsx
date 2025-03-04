@@ -125,7 +125,7 @@ const ChatPrompt = () => {
           <img
             className="emojiIcon"
             style={{ height: "25px" }}
-            src="/images/emoji.png"
+            src="https://ananyab002.github.io/Messenger-typescript-frontend/images/emoji.png"
             alt=""
             onClick={() => setOpenEmoji((prev) => !prev)}
           />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./userInfo.scss";
+import api from "../../../api/globalApi";
 
 /**
  * UserInfo component fetches and displays user profile information.
@@ -14,11 +15,11 @@ const UserInfo = () => {
   const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
 
   const fetchUserInfo = async () => {
-    const response = await fetch(
+    const response = await api.get(
       "https://ananyab002.github.io/Messenger-typescript-frontend/data/user.json"
     );
-    const userData = await response.json();
-    setUserInfo(userData);
+
+    setUserInfo(response.data);
   };
 
   useEffect(() => {

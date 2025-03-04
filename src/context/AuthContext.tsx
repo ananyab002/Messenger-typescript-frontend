@@ -1,9 +1,11 @@
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import { LoginDataType } from "../types/type";
+import api from "../api/globalApi";
+import { AxiosError } from "axios";
 
 interface LoginContextType {
-    currentUser: LoginDataType | undefined,
-    loginCurrentUser: (data: LoginDataType) => void;
+    currentUser: LoginDataType | null,
+    loginCurrentUser: (data: LoginDataType) => Promise<{ success: boolean }>;
     loginError: string | null
 }
 
@@ -11,52 +13,57 @@ export const AuthContext = createContext<LoginContextType | undefined>(undefined
 
 export const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
-    const [currentUser, setCurrentUser] = useState<LoginDataType>();
+    const [currentUser, setCurrentUser] = useState<LoginDataType | null>(() => {
+        try {
+            const storedData = localStorage.getItem("userData");
+            return storedData ? JSON.parse(storedData) : null;
+        } catch (error) {
+            console.log(error)
+            localStorage.removeItem("userData");
+            return null;
+        }
+    });
     const [loginError, setLoginError] = useState<string | null>(null);
 
+    useEffect(() => {
+        localStorage.setItem("userData", JSON.stringify(currentUser));
+    }, [currentUser]);
 
-    const loginCurrentUser = async (data: LoginDataType) => {
+    const loginCurrentUser = async (data: LoginDataType): Promise<{ success: boolean }> => {
         try {
-            const response = await fetch("http://localhost:8080/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify({ email: data.email, password: data.password })
+            const response = await api.post("auth/login", {
+                email: data.email,
+                password: data.password
+            });
 
-            })
-
-            const responseMessage = await response.json();
-            if (response.ok) {
-
-                console.log(responseMessage.token);
-                localStorage.setItem("authToken", responseMessage.token);
-                setCurrentUser(responseMessage.userData);
-
+            if (response.data) {
+                console.log(response);
+                localStorage.setItem("authToken", response.data.token);
+                setCurrentUser(response.data.userData);
+                return { success: true };
             }
-
-            if (response.status === 404) {
-                setLoginError(responseMessage.message);
-            }
-            if (response.status === 401) {
-                setLoginError(responseMessage.message);
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if (error.response) {
+                    if (error.response.status === 404) {
+                        setLoginError("User not found");
+                    }
+                    if (error.response.status === 401) {
+                        console.log("Inside catch");
+                        setLoginError("Invalid email or password");
+                    }
+                } else {
+                    setLoginError("Something went wrong. Please try again.");
+                }
+                console.error("Login error:", error);
             }
         }
-        catch (error) {
-            console.log(error);
-            setLoginError("Server failed. Please try again.")
-        }
+
+        return { success: false };
+
     }
 
     return (
         <AuthContext.Provider value={{ currentUser, loginCurrentUser, loginError }}>{children}</AuthContext.Provider>
     )
-}
-
-export function useLogin() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("It should not be undefined");
-    }
-    return context;
 }

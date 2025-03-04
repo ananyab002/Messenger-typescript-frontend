@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
 import "./addContact.scss";
-import { useLogin } from "../../../../context/AuthContext";
+
 import { ContactListType, SearchResultType } from "../../../../types/type";
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
+import api from "../../../../api/globalApi";
+import { useLogin } from "../../../../hooks/useLogin";
+import { AxiosError } from "axios";
 
 
 
 type AddContactProp = {
-    onClickAddContactDialog: (contactListData: ContactListType[]) => void;
+    onClickAddContactDialog: (contactListData?: ContactListType) => void;
 }
 const AddContact = ({ onClickAddContactDialog }: AddContactProp) => {
 
     const [searchInput, setSearchInput] = useState<string>();
     const [searchResults, setSearchResults] = useState<SearchResultType[]>();
+    const [addContactError, setAddContactError] = useState<string>();
     const { currentUser } = useLogin();
     const token = localStorage.getItem("authToken");
     console.log(currentUser);
@@ -20,68 +25,82 @@ const AddContact = ({ onClickAddContactDialog }: AddContactProp) => {
         if (!searchInput) {
             setSearchResults([]);
         }
+        const searchQuery = async (searchInput: string) => {
+            console.log(token)
+            if (!token) {
+                console.log("No auth token found!");
+                return;
+            }
+            try {
+                const response = await api.get(`users/search?query=${encodeURIComponent(searchInput)}`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+                console.log(response)
+                setSearchResults(response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
         const debounceTime = setTimeout(() => {
             if (searchInput)
                 searchQuery(searchInput);
 
         }, 300);
         return () => clearTimeout(debounceTime);
-    }, [searchInput]
+    }, [searchInput, token]
     );
 
-    const searchQuery = async (searchInput: string) => {
 
-        console.log(token)
-        if (!token) {
-            console.log("No auth token found!");
-            return;
-        }
-        try {
-            const response = await fetch(`http://localhost:8080/users/search?query=${encodeURIComponent(searchInput)}`, {
-                method: "GET",
-                headers: {
-                    "Content-type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            })
-            const data = await response.json();
-            console.log(response)
-            console.log(data)
-            setSearchResults(data);
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
     const handleAddContacts = async (contactId: string) => {
+        setAddContactError(undefined);
+        if (!currentUser?.userId || !token) {
+            setAddContactError("User is not authenticated");
+            return;
+        }
+        console.log(currentUser?.userId, token);
         try {
-            const response = await fetch(`http://localhost:8080/contacts?userId=${currentUser?.userId}&contactId=${contactId}`, {
-                method: "POST",
+            const response = await api.post(`contacts?userId=${currentUser?.userId}&contactId=${contactId}`, {}, {
                 headers: {
-                    "Content-type": "application/json",
                     "Authorization": `Bearer ${token}`
                 }
             });
-            if (response.ok) {
-                console.log(response);
-                const contactListData = await response.json();
-                console.log(contactListData);
-                onClickAddContactDialog(contactListData);
+            if (response.data) {
+                console.log(response.data);
+                onClickAddContactDialog(response.data);
             }
-        } catch (error) {
-            console.log(error)
+            else {
+                console.log(response.data.message)
+                setAddContactError(response.data.message);
+            }
 
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                if (error.response) {
+                    console.error("Axios Error:", error.response.data);
+                    setAddContactError(error.response.data);
+                    console.log(error)
+                }
+
+            }
         }
+    }
 
+    const handleCancelAddContact = () => {
+        onClickAddContactDialog();
     }
     return (
         <>
             <div className="overlay"></div>
             <div className="addContacts">
-                <h3>Add New Contact</h3>
+                <h3 style={{ textAlign: "center" }}>Add New Contact</h3>
+                <DisabledByDefaultIcon className="closeButton" onClick={handleCancelAddContact}></DisabledByDefaultIcon>
                 <form>
                     <input type="text" placeholder="Contact name" onChange={(e) => setSearchInput(e.target.value)} />
                 </form>
+                {addContactError && <div style={{ margin: "5px", color: "red" }}>{addContactError}</div>}
                 {searchResults && searchResults.map(item => (
                     <div key={item.userId} className="searchList">
                         <div className="user">
