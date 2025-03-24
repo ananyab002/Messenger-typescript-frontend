@@ -1,23 +1,25 @@
-import { useContext, useEffect, useState } from "react";
-import { ChatMessagesContext, ChatMessagesContextType } from "../../../context/ChatMessagesContext";
+import { useEffect, useState } from "react";
+import { useChat } from "../../../context/ChatMessagesContext";
 import "./contactList.scss";
 import { useNavigate } from "react-router-dom";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import SearchIcon from '@mui/icons-material/Search';
 import AddContact from "./addContact/AddContact";
-import { useFetchContactList } from "../../../hooks/useFetchContactList";
+import { useFetchContactList } from "../../../hooks/useContacts";
 import { ContactListType } from "../../../types/type";
+import { useLogin } from "../../../hooks/useLogin";
 
 /**
  * Fetches contact list data from a JSON file and updates state.
  */
 
 const ContactList = () => {
-  const { fetchInitialMessages } = useContext<ChatMessagesContextType>(ChatMessagesContext);
+  const { fetchAllMessages } = useChat();
   const { contactList, fetchContactList, updateContactList } = useFetchContactList();
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [searchText, setSearchText] = useState<string>();
   const [addContactDialog, setAddContactDialog] = useState<boolean>(false);
+  const { currentUser } = useLogin();
   const navigate = useNavigate();
 
   console.log(contactList);
@@ -27,12 +29,16 @@ const ContactList = () => {
   }, [fetchContactList])
 
   const getMessages = async (contactId: string, chatId: string) => {
+    const userId = currentUser?.userId;
+    console.log(chatId)
+    if (!userId)
+      return;
     try {
-      console.log("getMessages", contactId, chatId)
-      await fetchInitialMessages(chatId);
+      console.log("getMessages", contactId, chatId);
+      const actualChatId = await fetchAllMessages(userId, contactId, chatId);
       setSelectedContactId(contactId);
-      console.log(selectedContactId);
-      navigate(`/Messenger-typescript-frontend/messenger/` + chatId);
+      console.log(selectedContactId, actualChatId);
+      navigate(`/Messenger-typescript-frontend/messenger/` + actualChatId);
 
     } catch (error) {
       console.log(error);

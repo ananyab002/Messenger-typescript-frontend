@@ -1,21 +1,16 @@
 import { useState, useCallback } from 'react'
 import { ContactListType } from '../types/type';
-
-import api from '../api/globalApi';
 import { useLogin } from './useLogin';
+import { contactApi } from '../api/contactsApi';
 
 export const useFetchContactList = () => {
     const [contactList, setContactList] = useState<ContactListType[]>([]);
     const [isInitialized, setIsInitialized] = useState(false);
-    const token = localStorage.getItem("authToken");
     const { currentUser } = useLogin();
 
     const fetchDummyContactList = async () => {
         try {
-            const response = await api.get(
-                "https://ananyab002.github.io/Messenger-typescript-frontend/data/contactList.json"
-            );
-
+            const response = await contactApi.getDummyContacts();
             console.log(response.data)
             return response.data;
 
@@ -25,22 +20,20 @@ export const useFetchContactList = () => {
     }
     const fetchActualContactList = async () => {
         const userId = currentUser?.userId;
+        const token = localStorage.getItem("authToken");
         if (!userId) {
             console.error("User ID is missing.");
             // Optionally, handle this case (e.g., redirect to login)
             return;
         }
-
         if (!token) {
-            console.error("Auth Token is missing.");
+            console.error("Token is missing.");
+            // Optionally, handle this case (e.g., redirect to login)
             return;
         }
         try {
-            const response = await api.get(`contacts/getContacts/${userId}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
+
+            const response = await contactApi.getActualContacts(userId, token);
             console.log(response.data)
             return response.data;
         } catch (error) {

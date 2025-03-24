@@ -7,6 +7,9 @@ export const useAuthInterceptor = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const token = localStorage.getItem('authToken'); // Get token from storage
+        console.log(token)
+        if (!token) return;
         const interceptor = api.interceptors.response.use(
             response => response,
             error => {

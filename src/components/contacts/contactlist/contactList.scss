@@ -1,9 +1,13 @@
 .contactList {
+  display: flex;
+  flex-direction: column;
+
   .addSearchContacts {
     display: flex;
     align-items: center;
     // justify-content: space-between;
     margin: 10px;
+    flex-shrink: 0;
     input {
       background-color: black;
       padding: 15px;
@@ -33,7 +37,13 @@
     flex-direction: column;
     border-bottom: 1px solid #dddddd35;
     border-top: 1px solid #dddddd35;
-
+    overflow: scroll;
+    max-height: 500px; /* Adjust as needed */
+    overflow-y: auto; /* Enables scrolling for the list */
+    overflow-x: hidden; /* Prevents horizontal scrolling */
+    scrollbar-color: #222 black;
+    scroll-behavior: smooth;
+    flex-grow: 1;
     .user {
       display: flex;
       align-items: center;

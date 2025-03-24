@@ -3,9 +3,9 @@ import "./addContact.scss";
 
 import { ContactListType, SearchResultType } from "../../../../types/type";
 import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
-import api from "../../../../api/globalApi";
 import { useLogin } from "../../../../hooks/useLogin";
 import { AxiosError } from "axios";
+import { contactApi } from "../../../../api/contactsApi";
 
 
 
@@ -19,6 +19,7 @@ const AddContact = ({ onClickAddContactDialog }: AddContactProp) => {
     const [addContactError, setAddContactError] = useState<string>();
     const { currentUser } = useLogin();
     const token = localStorage.getItem("authToken");
+
     console.log(currentUser);
 
     useEffect(() => {
@@ -26,18 +27,14 @@ const AddContact = ({ onClickAddContactDialog }: AddContactProp) => {
             setSearchResults([]);
         }
         const searchQuery = async (searchInput: string) => {
+            const token = localStorage.getItem("authToken");
             console.log(token)
             if (!token) {
                 console.log("No auth token found!");
                 return;
             }
             try {
-                const response = await api.get(`users/search?query=${encodeURIComponent(searchInput)}`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                })
-                console.log(response)
+                const response = await contactApi.searchContact(searchInput, token);
                 setSearchResults(response.data);
             } catch (error) {
                 console.log(error);
@@ -56,17 +53,14 @@ const AddContact = ({ onClickAddContactDialog }: AddContactProp) => {
 
     const handleAddContacts = async (contactId: string) => {
         setAddContactError(undefined);
-        if (!currentUser?.userId || !token) {
+        const userId = currentUser?.userId;
+        const token = localStorage.getItem("authToken");
+        if (!userId || !token) {
             setAddContactError("User is not authenticated");
             return;
         }
-        console.log(currentUser?.userId, token);
         try {
-            const response = await api.post(`contacts?userId=${currentUser?.userId}&contactId=${contactId}`, {}, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
+            const response = await contactApi.addContact(userId, contactId, token);
             if (response.data) {
                 console.log(response.data);
                 onClickAddContactDialog(response.data);

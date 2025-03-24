@@ -1,7 +1,7 @@
 import "./contactInfo.scss";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useFetchContactList } from "../../../hooks/useFetchContactList";
+import { useFetchContactList } from "../../../hooks/useContacts";
 import { useEffect } from "react";
 
 /**

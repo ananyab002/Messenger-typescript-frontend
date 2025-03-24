@@ -38,39 +38,33 @@ const ChatPrompt = () => {
   }
 
   const handleSendMessage: SubmitHandler<ChatPromptType> = async (data) => {
-    const updatedPromptDraft = promtDraftMessages.filter(item => item.promptChatID != chatID && item.promptMessage != data.message);
-    setPromptDraftMessages(updatedPromptDraft);
-    let messageObject;
-    if (data.message.trim().length === 0) {
-      return;
-    }
-    if (replyMessage) {
-      messageObject = {
-        // id 1 is for the user
-        id: 1,
-        message: data.message,
-        time: formatTime(new Date()),
-        date: getFormattedDate(new Date()),
-        msgId: 10,
-        repliedToMsgId: replyMessage.msgId,
-        repliedToMessage: replyMessage.message
-      };
-      updateAllMessages(messageObject, chatID || "");
-    }
-    else {
-      messageObject = {
-        // id 1 is for the user
-        id: 1,
-        message: data.message,
-        time: formatTime(new Date()),
-        date: getFormattedDate(new Date()),
-        msgId: 10,
-      };
-      updateAllMessages(messageObject, chatID || "");
-    }
-
-
-    reset();
+    // const updatedPromptDraft = promtDraftMessages.filter(item => item.promptChatID != chatID && item.promptMessage != data.message);
+    // setPromptDraftMessages(updatedPromptDraft);
+    // if (data.message.trim().length === 0) {
+    //   return;
+    // }
+    // // if (replyMessage) {
+    // //   messageObject = {
+    // //     // id 1 is for the user
+    // //     id: 1,
+    // //     message: data.message,
+    // //     time: formatTime(new Date()),
+    // //     date: getFormattedDate(new Date()),
+    // //     msgId: 10,
+    // //     repliedToMsgId: replyMessage.msgId,
+    // //     repliedToMessage: replyMessage.message
+    // //   };
+    // //   updateAllMessages(messageObject, chatID || "");
+    // // }
+    // // else {
+    // const messageObject = {
+    //   // id 1 is for the user
+    //   senderId: 1,
+    //   receiverId:
+    //     content: data.message
+    // };
+    // updateAllMessages(messageObject, chatID || "");
+    // reset();
   };
 
   /**
