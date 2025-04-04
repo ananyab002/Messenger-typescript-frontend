@@ -1,41 +1,23 @@
-import { useEffect, useState } from "react";
 import "./userInfo.scss";
-import api from "../../../api/globalApi";
+import { useLogin } from "../../../hooks/useLogin";
 
 /**
  * UserInfo component fetches and displays user profile information.
  */
-interface UserInfoType {
-  id: number,
-  name: string,
-  img: string,
-  status: string
-}
+
 const UserInfo = () => {
-  const [userInfo, setUserInfo] = useState<UserInfoType | null>(null);
-
-  const fetchUserInfo = async () => {
-    const response = await api.get(
-      "https://ananyab002.github.io/Messenger-typescript-frontend/data/user.json"
-    );
-
-    setUserInfo(response.data);
-  };
-
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
+  const { currentUser } = useLogin();
 
   return (
     <div className="userInfo">
       <p>My Profile</p>
-      {userInfo && (
+      {currentUser && (
         <div className="user">
-          <img src={userInfo.img} alt={userInfo.img} />
-          <span>{userInfo.name}</span>
+          <img src={currentUser.image} alt={currentUser.image} />
+          <span>{currentUser.name}</span>
           <div className="status">
             <p>Status:</p>
-            <p>{userInfo.status}</p>
+            {/* <p>{currentUser.status}</p> */}
           </div>
         </div>
       )}

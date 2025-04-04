@@ -1,24 +1,17 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import { Message, RepliedToMessageType } from "../types/type";
+import { MessageType, RepliedToMessageType } from "../types/type";
 import api from "../api/globalApi";
 
 
 
 export interface ChatMessagesContextType {
-  allMessages: { [key: string]: Message[] };
-  fetchAllMessages: (userId: number, contactId: string, chatId?: string) => Promise<string>;
-  updateAllMessages: (message: Message, chatID: string) => void;
+  allMessages: { [key: string]: MessageType[] };
+  fetchAllMessages: (userId: number, contactId: string) => Promise<string | undefined>;
+  updateAllMessages: (chatID: string, recievedMessage: MessageType) => void;
   updateReplyMessages: (action: string, message?: string, chatID?: string, msgId?: number) => void;
   replyMessage: RepliedToMessageType | undefined;
 }
 
-// const defaultContextValue: ChatMessagesContextType = {
-//   allMessages: {},
-//   fetchAllMessages: async ():Promise<string> => {return "" },
-//   updateAllMessages: async () => { },
-//   updateReplyMessages: async () => { },
-//   replyMessage: undefined
-// };
 interface Props {
   children: ReactNode
 }
@@ -26,27 +19,10 @@ export const ChatMessagesContext = createContext<ChatMessagesContextType | undef
 
 export const ChatMessagesContextProvider = ({ children }: Props) => {
 
-  const [allMessages, setAllMessages] = useState<{ [key: string]: Message[] }>({});
+  const [allMessages, setAllMessages] = useState<{ [key: string]: MessageType[] }>({});
   const [replyMessage, setReplyMessage] = useState<RepliedToMessageType | undefined>();
 
-  const fetchInitialMessages = async (chatID: string) => {
-    console.log("fetchInitialMessages");
-    try {
-      const response = await fetch(
-        "https://ananyab002.github.io/Messenger-typescript-frontend/data/initialMessages.json"
-      );
-      if (!response.ok) throw new Error("Failed to fetch messages");
-      const data = await response.json();
-      const chatIdData = { [chatID]: [...data[chatID]] };
-      console.log("Initial Data", chatIdData)
-      return chatIdData;
-    }
-    catch (error) {
-      console.log(error)
-    }
-  };
-
-  const fetchActualMessages = async (userId: number, contactId: string) => {
+  const fetchAllMessages = async (userId: number, contactId: string) => {
     try {
 
       const token = localStorage.getItem("authToken");
@@ -57,7 +33,10 @@ export const ChatMessagesContextProvider = ({ children }: Props) => {
       if (response.data) {
         const data = response.data;
         console.log(data)
-        return data;
+        setAllMessages(data);
+        const chatId = Object.keys(data)[0] || "";
+        console.log(chatId)
+        return chatId;
       }
       else
         console.log("Empty")
@@ -68,38 +47,9 @@ export const ChatMessagesContextProvider = ({ children }: Props) => {
     }
   }
 
-  const fetchAllMessages = async (userId: number, contactId: string, chatId?: string) => {
-    let dummyMessages;
-    let actualMessages;
-    console.log(chatId)
-    if (chatId) {
-      dummyMessages = await fetchInitialMessages(chatId);
-      if (dummyMessages)
-        setAllMessages({ ...dummyMessages });
-    }
-    else {
-      actualMessages = await fetchActualMessages(userId, contactId);
-      if (actualMessages)
-        setAllMessages({ ...actualMessages });
-      if (dummyMessages && actualMessages)
-        setAllMessages({ dummyMessages, ...actualMessages })
-    }
-    const actualChatId = chatId ? chatId : Object.keys(actualMessages)[0] || "";
-    console.log(actualChatId)
-    return actualChatId;
-  }
-
-
-  const updateAllMessages = async (message: Message, chatID: string) => {
-    setAllMessages((prevData) => {
-      const updatedMessages = [...prevData[chatID], message];
-      return {
-        ...prevData,
-        [chatID]: updatedMessages,
-      };
-    });
-    setReplyMessage(undefined);
-    console.log(allMessages);
+  const updateAllMessages = async (chatID: string, recievedMessage: MessageType) => {
+    console.log(recievedMessage)
+    setAllMessages(prev => ({ ...prev, [chatID]: [...prev[chatID], recievedMessage] }))
   };
 
   const updateReplyMessages = async (action: string, message?: string, chatID?: string, msgId?: number) => {

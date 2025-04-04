@@ -1,9 +1,10 @@
-export interface Message {
-  id: string|number,
-  message: string,
-  time: string,
-  date: string,
+export interface MessageType {
   msgId: number,
+  content: string,
+  sentAt: string,
+  isRead: string,
+  chatId: string,
+  senderId:number,
   repliedToMsgId?: number
   repliedToMessage?:string
 }
@@ -28,6 +29,8 @@ export interface LoginDataType {
   dob: Date,
   gender: string,
   country: string,
+  image: string,
+  name:string
 
 }
 

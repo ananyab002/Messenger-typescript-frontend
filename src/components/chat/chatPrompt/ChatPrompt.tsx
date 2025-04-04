@@ -1,10 +1,11 @@
-import { getFormattedDate, formatTime } from "../../../utils/date";
+
 import { SubmitHandler, useForm } from "react-hook-form";
-import { memo, useContext, useEffect, useState } from "react";
-import { ChatMessagesContext } from "../../../context/ChatMessagesContext";
-import { useParams } from "react-router-dom";
+import { memo, useEffect, useState } from "react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import "./chatPrompt.scss";
+import { useLogin } from "../../../hooks/useLogin";
+import useWebSocket from "../../../hooks/useWebSocket";
+import { useSelectedContact } from "../../../hooks/useSelectedContact";
 
 /**
  *  Handles the input and submission of new chat messages.
@@ -17,18 +18,24 @@ interface PromptDraftMessage {
   promptChatID: string | undefined,
   promptMessage: string
 }
-const ChatPrompt = () => {
+
+type ChatPromptPropType = {
+  chatID: string
+}
+const ChatPrompt = ({ chatID }: ChatPromptPropType) => {
   const { register, handleSubmit, setValue, reset, getValues } = useForm<ChatPromptType>();
   const [openEmoji, setOpenEmoji] = useState(false);
   const [promtDraftMessages, setPromptDraftMessages] = useState<PromptDraftMessage[]>([]);
-  const { updateAllMessages, replyMessage } = useContext(ChatMessagesContext);
-  const { chatID } = useParams();
+  const { currentUser } = useLogin();
+  const { sendMessage } = useWebSocket(chatID);
+  const { selectedContact } = useSelectedContact();
 
   useEffect(() => {
     getDraftMessages()
   }, [chatID]);
 
   const getDraftMessages = () => {
+    console.log("chatId", chatID)
     const promptMessageValue = promtDraftMessages.find(draftMsg => chatID === draftMsg.promptChatID);
     if (promptMessageValue) {
       setValue("message", promptMessageValue.promptMessage);
@@ -38,11 +45,25 @@ const ChatPrompt = () => {
   }
 
   const handleSendMessage: SubmitHandler<ChatPromptType> = async (data) => {
-    // const updatedPromptDraft = promtDraftMessages.filter(item => item.promptChatID != chatID && item.promptMessage != data.message);
-    // setPromptDraftMessages(updatedPromptDraft);
-    // if (data.message.trim().length === 0) {
-    //   return;
-    // }
+    const updatedPromptDraft = promtDraftMessages.filter(item => item.promptChatID != chatID && item.promptMessage != data.message);
+    const userId = currentUser?.userId;
+    const token = localStorage.getItem("authToken");
+    const receiverId = selectedContact?.contactId;
+    if (!userId)
+      return;
+    if (!token)
+      return;
+    if (!chatID)
+      return;
+    if (!receiverId)
+      return;
+
+
+    setPromptDraftMessages(updatedPromptDraft);
+    if (data.message.trim().length === 0) {
+      return;
+    }
+
     // // if (replyMessage) {
     // //   messageObject = {
     // //     // id 1 is for the user
@@ -57,14 +78,8 @@ const ChatPrompt = () => {
     // //   updateAllMessages(messageObject, chatID || "");
     // // }
     // // else {
-    // const messageObject = {
-    //   // id 1 is for the user
-    //   senderId: 1,
-    //   receiverId:
-    //     content: data.message
-    // };
-    // updateAllMessages(messageObject, chatID || "");
-    // reset();
+    sendMessage(data.message, userId, receiverId);
+    reset();
   };
 
   /**

@@ -1,63 +1,87 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { ContactListType } from '../types/type';
 import { useLogin } from './useLogin';
 import { contactApi } from '../api/contactsApi';
+import { Client, Message } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
-export const useFetchContactList = () => {
+const SOCKET_URL = "http://localhost:8080/message";
+
+export const useContact = () => {
     const [contactList, setContactList] = useState<ContactListType[]>([]);
     const [isInitialized, setIsInitialized] = useState(false);
     const { currentUser } = useLogin();
+    const token = localStorage.getItem("authToken");
 
-    const fetchDummyContactList = async () => {
-        try {
-            const response = await contactApi.getDummyContacts();
-            console.log(response.data)
-            return response.data;
-
-        } catch (error) {
-            console.error("Error fetching contact list:", error);
-        }
-    }
-    const fetchActualContactList = async () => {
+    const fetchInitialContacts = useCallback(async () => {
         const userId = currentUser?.userId;
         const token = localStorage.getItem("authToken");
         if (!userId) {
             console.error("User ID is missing.");
-            // Optionally, handle this case (e.g., redirect to login)
             return;
         }
         if (!token) {
             console.error("Token is missing.");
-            // Optionally, handle this case (e.g., redirect to login)
             return;
         }
         try {
 
-            const response = await contactApi.getActualContacts(userId, token);
+            const response = await contactApi.getContacts(userId, token);
             console.log(response.data)
-            return response.data;
+            if (!isInitialized) {
+                console.log("Inside block")
+                if (response.data)
+                    setContactList(response.data);
+                setIsInitialized(true);
+            }
         } catch (error) {
             console.log(error);
         }
-    }
+    }, [currentUser?.userId, isInitialized]);
 
-    const fetchContactList = async () => {
-        if (!isInitialized) {
-            const dummyData = await fetchDummyContactList();
-            const actualData = await fetchActualContactList();
-            if (actualData && dummyData)
-                setContactList([...dummyData, ...actualData]);
-            setIsInitialized(true);
-        }
-    }
 
-    const updateContactList = useCallback((newContacts: ContactListType[]) => {
-        setContactList(newContacts);
+    const updateContactList = useCallback((newContact: ContactListType) => {
+        setContactList(prev => [...prev, newContact]);
     }, []);
+
+    useEffect(() => {
+        if (!currentUser) return;
+        if (!token) return;
+
+        fetchInitialContacts();
+
+        const stompClient = new Client({
+            webSocketFactory: () => {
+                return new SockJS(`${SOCKET_URL}?token=${token}`);
+            },
+            reconnectDelay: 5000
+        });
+
+        stompClient.onConnect = () => {
+            console.log('WebSocket connected');
+
+            stompClient.subscribe(`/topic/contacts/${currentUser.userId}`, (message: Message) => {
+                const data = JSON.parse(message.body);
+                console.log(data);
+                updateContactList(data);
+            });
+        };
+
+        stompClient.onDisconnect = () => {
+            console.log('WebSocket disconnected');
+        };
+
+        stompClient.activate();
+
+        return () => {
+            if (stompClient.active) {
+                stompClient.deactivate();
+            }
+        };
+    }, [currentUser, token, fetchInitialContacts, updateContactList]);
 
     return {
         contactList,
-        fetchContactList,
         updateContactList
     };
 }

@@ -1,13 +1,13 @@
-import { useContext } from "react";
+
 import ChatDialog from "./chatDialog/ChatDialog";
 import ContactInfo from "./contactInfo/ContactInfo";
-import { ChatMessagesContext } from "../../context/ChatMessagesContext";
+import { useChat } from "../../context/ChatMessagesContext";
 import { useParams } from "react-router-dom";
 import ChatPrompt from "./chatPrompt/ChatPrompt";
 import "./chat.scss";
 
 const Chat = () => {
-  const { allMessages } = useContext(ChatMessagesContext);
+  const { allMessages } = useChat();
   const { chatID } = useParams<{ chatID: string }>();
   return (
     <div className="chatComponent">
@@ -15,7 +15,7 @@ const Chat = () => {
         <div className="chat-container">
           <ContactInfo />
           <ChatDialog />
-          <ChatPrompt />
+          <ChatPrompt chatID={chatID} />
         </div>
       ) : (
         <div className="info">Please select a friend to chat.</div>

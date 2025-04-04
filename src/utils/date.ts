@@ -6,16 +6,19 @@ function getDate(givenDate: Date | string | number): string  {
   return `${month}/${date}/${year}`;
 }
 
-function getFormattedDate(date: Date): string{
+function getFormattedDate(dateInput: string): string{
+  const date = new  Date(dateInput);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  // const day = String(date.getDate()).padStart(2, "0");
+  const InputDate = date.getDate();
+  return `${InputDate}/${month}/${year}`;
 }
 
-function formatTime(date: Date): string {
+function formatTime(dateStr: string): string {
+  const date = new Date(dateStr);
   let hours = date.getHours();
-  let minutes = date.getMinutes();
+  const minutes = date.getMinutes();
   const ampm = hours >= 12 ? "PM" : "AM";
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'

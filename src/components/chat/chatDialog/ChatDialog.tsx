@@ -1,13 +1,14 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { getDate } from "../../../utils/date";
-import { ChatMessagesContext } from "../../../context/ChatMessagesContext";
+import { getDate, formatTime, getFormattedDate } from "../../../utils/date";
+import { ChatMessagesContext, useChat } from "../../../context/ChatMessagesContext";
 import { useParams } from "react-router-dom";
-import { EmojiReactions, Message } from "../../../types/type";
+import { EmojiReactions, MessageType } from "../../../types/type";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddReactionIcon from '@mui/icons-material/AddReaction';
 import "./chatDialog.scss";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import CancelIcon from '@mui/icons-material/Cancel';
+import { useLogin } from "../../../hooks/useLogin";
 
 
 /**
@@ -20,13 +21,15 @@ const ChatDialog = () => {
   const { allMessages } = useContext(ChatMessagesContext) ?? {};
   const { chatID } = useParams();
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [selectedMsgId, setselectedMsgId] = useState<number>();
   const [openEmojiPicker, setOpenEmojiPicker] = useState<boolean>(false);
   const [deleteMsgId, setDeleteMsgId] = useState<number>();
   const [emojiReactions, setEmojiReactions] = useState<EmojiReactions[]>([]);
   // const [replyMessage, setReplyMessage] = useState<RepliedToMessageType>();
-  const { replyMessage, updateReplyMessages } = useContext(ChatMessagesContext);
+  const { replyMessage, updateReplyMessages } = useChat();
+  const { currentUser } = useLogin();
+
   /**
    * Fetches messages for the current chatID from the context and
    * updates the local state with the fetched messages.
@@ -38,6 +41,7 @@ const ChatDialog = () => {
   useEffect(() => {
     fetch();
   }, [chatID, allMessages, fetch]);
+
 
   /**
    * useEffect to bottom scroll.
@@ -106,36 +110,36 @@ const ChatDialog = () => {
           <div
             onClick={() => setDeleteMsgId(message.msgId)}
             key={index}
-            className={message.id === 1 ? "message user" : "message"}
+            className={message.senderId === currentUser?.userId ? "message user" : "message"}
           >
             {message.repliedToMsgId ? (
               <div className="text-container">
                 <div className="replyChatDiv">
                   <p> {message.repliedToMessage}</p>
-                  <div className="reply-texts" onDoubleClick={handleReplyMessage(message.msgId, message.message)}>
-                    <p>{message.message}</p>
+                  <div className="reply-texts" onDoubleClick={handleReplyMessage(message.msgId, message.content)}>
+                    <p>{message.content}</p>
                     <div className="dateTime">
                       <span>
-                        {getDate(message.date) === getDate(todayDate)
+                        {getDate(message.sentAt) === getDate(todayDate)
                           ? ""
-                          : message.date}
+                          : getFormattedDate(message.sentAt)}
                       </span>
-                      <span> {message.time}</span>
+                      <span> {formatTime(message.sentAt)}</span>
                     </div>
                   </div>
                 </div>
 
               </div>) :
 
-              (<div className="texts" onDoubleClick={handleReplyMessage(message.msgId, message.message)}>
-                <p>{message.message}</p>
+              (<div className="texts" onDoubleClick={handleReplyMessage(message.msgId, message.content)}>
+                <p>{message.content}</p>
                 <div className="dateTime">
                   <span>
-                    {getDate(message.date) === getDate(todayDate)
+                    {getDate(message.sentAt) === getDate(todayDate)
                       ? ""
-                      : message.date}
+                      : getFormattedDate(message.sentAt)}
                   </span>
-                  <span> {message.time}</span>
+                  <span> {formatTime(message.sentAt)}</span>
                 </div>
               </div>)}
             {getEmojiReactions(message.msgId).length === 0 &&
@@ -149,7 +153,7 @@ const ChatDialog = () => {
               </div>}
 
             < div className="deleteMsg">
-              {message.id === 1 && message.msgId === deleteMsgId && <DeleteIcon onClick={handleDeleteMsg(message.msgId)} sx={{ color: "red", fontSize: "20px" }} />}
+              {message.senderId === currentUser?.userId && message.msgId === deleteMsgId && <DeleteIcon onClick={handleDeleteMsg(message.msgId)} sx={{ color: "red", fontSize: "20px" }} />}
             </div>
 
             <div className="emojiPick">
