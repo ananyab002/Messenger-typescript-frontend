@@ -1,14 +1,16 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useState } from "react";
 import { MessageType, RepliedToMessageType } from "../types/type";
 import api from "../api/globalApi";
 
 
 
 export interface ChatMessagesContextType {
-  allMessages: { [key: string]: MessageType[] };
-  fetchAllMessages: (userId: number, contactId: string) => Promise<string | undefined>;
-  updateAllMessages: (chatID: string, recievedMessage: MessageType) => void;
-  updateReplyMessages: (action: string, message?: string, chatID?: string, msgId?: number) => void;
+  allMessages: MessageType[];
+  fetchAllMessages: (userId: number, contactId: string) => Promise<number>;
+  updateAllMessages: (recievedMessage: MessageType) => void;
+  updateMessageReactions: (msgId: number, emojiReaction: string) => void;
+  deletedMessages: (msgId: number) => void;
+  updateReplyMessages: (action: string, message?: string, chatID?: number, msgId?: number) => void;
   replyMessage: RepliedToMessageType | undefined;
 }
 
@@ -19,7 +21,7 @@ export const ChatMessagesContext = createContext<ChatMessagesContextType | undef
 
 export const ChatMessagesContextProvider = ({ children }: Props) => {
 
-  const [allMessages, setAllMessages] = useState<{ [key: string]: MessageType[] }>({});
+  const [allMessages, setAllMessages] = useState<MessageType[]>([]);
   const [replyMessage, setReplyMessage] = useState<RepliedToMessageType | undefined>();
 
   const fetchAllMessages = async (userId: number, contactId: string) => {
@@ -33,10 +35,9 @@ export const ChatMessagesContextProvider = ({ children }: Props) => {
       if (response.data) {
         const data = response.data;
         console.log(data)
-        setAllMessages(data);
-        const chatId = Object.keys(data)[0] || "";
-        console.log(chatId)
-        return chatId;
+        setAllMessages(data.messages);
+        console.log(data.chatId)
+        return data.chatId;
       }
       else
         console.log("Empty")
@@ -47,12 +48,27 @@ export const ChatMessagesContextProvider = ({ children }: Props) => {
     }
   }
 
-  const updateAllMessages = async (chatID: string, recievedMessage: MessageType) => {
+  const updateAllMessages = async (recievedMessage: MessageType) => {
     console.log(recievedMessage)
-    setAllMessages(prev => ({ ...prev, [chatID]: [...prev[chatID], recievedMessage] }))
+    setAllMessages(prev => {
+      const existingMsg = prev.some(msg => msg.msgId === recievedMessage.msgId);
+      if (existingMsg)
+        return prev;
+      return [...prev, recievedMessage];
+    })
   };
 
-  const updateReplyMessages = async (action: string, message?: string, chatID?: string, msgId?: number) => {
+  const updateMessageReactions = (msgId: number, emojiReaction: string) => {
+    setAllMessages(prevMessages =>
+      prevMessages.map(msg => msg.msgId == msgId ? { ...msg, emojiReaction: emojiReaction } : msg)
+    );
+  }
+
+  const deletedMessages = (msgId: number) => {
+    setAllMessages(prevMessages => prevMessages.filter(msg => msg.msgId !== msgId));
+  }
+
+  const updateReplyMessages = async (action: string, message?: string, chatID?: number, msgId?: number) => {
     if (action === "open" && message && chatID && msgId) {
       setReplyMessage({ message, chatID, msgId });
       console.log("Open reply", replyMessage);
@@ -65,17 +81,10 @@ export const ChatMessagesContextProvider = ({ children }: Props) => {
 
   return (
     <ChatMessagesContext.Provider
-      value={{ allMessages, fetchAllMessages, updateAllMessages, updateReplyMessages, replyMessage }}
+      value={{ allMessages, fetchAllMessages, updateAllMessages, updateMessageReactions, deletedMessages, updateReplyMessages, replyMessage }}
     >
       {children}
     </ChatMessagesContext.Provider>
   );
 };
 
-export function useChat() {
-  const context = useContext(ChatMessagesContext);
-  if (context == undefined)
-    throw new Error("Undefined is not allowed");
-
-  return context;
-}

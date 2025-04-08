@@ -1,16 +1,16 @@
 import { useEffect, useRef, useCallback } from "react";
 import { Client, Message } from "@stomp/stompjs";
-import { useChat } from "../context/ChatMessagesContext";
 import { MessageType } from "../types/type";
 import SockJS from "sockjs-client";
 import { useLogin } from "./useLogin";
 import { useContact } from "./useContacts";
+import { getCommonHeaders } from "../api/headers";
+import { useChat } from "./useChat";
 
-const SOCKET_URL = "http://localhost:8080/message"; // Direct WebSocket URL
-
-export const useWebSocket = (chatId: string) => {
+export const useWebSocket = (chatId: number) => {
+  const SOCKET_URL = "http://localhost:8080/message";
   const token = localStorage.getItem("authToken");
-  const { updateAllMessages } = useChat();
+  const { updateAllMessages, updateMessageReactions, deletedMessages } = useChat();
   const clientRef = useRef<Client | null>(null);
   const { currentUser } = useLogin();
   const { updateContactList } = useContact();
@@ -35,8 +35,20 @@ export const useWebSocket = (chatId: string) => {
           client.subscribe(`/topic/chats/${chatId}`, (message: Message) => {
             const receivedMessage: MessageType = JSON.parse(message.body);
             console.log("Received", receivedMessage)
-            updateAllMessages(chatId, receivedMessage);
+            updateAllMessages(receivedMessage);
           });
+
+          client.subscribe(`/topic/chats/${chatId}/emojiReactions`, (reaction: Message) => {
+            const messageReaction: MessageType = JSON.parse(reaction.body);
+            console.log(messageReaction);
+            updateMessageReactions(messageReaction.msgId, messageReaction.emojiReaction);
+          })
+
+          client.subscribe(`/topic/chats/${chatId}/deletion`, (message: Message) => {
+            const deletedMessage: MessageType = JSON.parse(message.body);
+            console.log(deletedMessage);
+            deletedMessages(deletedMessage.msgId);
+          })
         }
 
       },
@@ -44,8 +56,8 @@ export const useWebSocket = (chatId: string) => {
       reconnectDelay: 5000,
     });
 
-    client.activate();
     clientRef.current = client;
+    client.activate();
 
     return () => {
       if (clientRef.current) {
@@ -53,25 +65,34 @@ export const useWebSocket = (chatId: string) => {
         clientRef.current = null;
       }
     };
-  }, [chatId, token, updateAllMessages, updateContactList]);
+  }, [chatId, token, updateAllMessages, updateContactList, deletedMessages, updateMessageReactions, currentUser?.userId]);
 
-  const sendMessage = useCallback((content: string, senderId: number, receiverId: string) => {
-    if (!token)
-      return;
-    if (!chatId)
-      return;
-    if (!senderId)
-      return
-    console.log(content, chatId, senderId)
-    clientRef.current?.publish({
-      destination: "/app/send",
-      body: JSON.stringify({ chatId, content, senderId, receiverId }),
-      headers: { Authorization: `Bearer ${token}` },
+  const publishMessage = useCallback((destination: string, body: any = {}, headers: any = {}) => {
+    if (!token || !chatId || !clientRef.current) return;
+
+    const allHeaders = { ...getCommonHeaders(), ...headers }
+
+    clientRef.current.publish({
+      destination,
+      body: JSON.stringify(body),
+      headers: allHeaders,
     });
-
   }, [chatId, token]);
 
-  return { sendMessage };
+  const sendMessage = useCallback((content: string, senderId: number, receiverId: string) => {
+    if (!senderId) return;
+    publishMessage("/app/send", { chatId, content, senderId, receiverId });
+  }, [chatId, publishMessage]);
+
+  const sendMessageEmojiReaction = useCallback((messageId: number, emoji: string) => {
+    publishMessage(`/app/reaction/${messageId}/${emoji}`, {})
+  }, [publishMessage]);
+
+  const sendDeleteMessage = useCallback((messageId: number) => {
+    publishMessage(`/app/delete/${messageId}`, {});
+  }, [publishMessage]);
+
+  return { sendMessage, sendMessageEmojiReaction, sendDeleteMessage };
 };
 
 export default useWebSocket;

@@ -4,18 +4,19 @@ export interface MessageType {
   sentAt: string,
   isRead: string,
   chatId: string,
-  senderId:number,
+  senderId: number,
+  emojiReaction:string,
   repliedToMsgId?: number
   repliedToMessage?:string
 }
 
-export interface EmojiReactions{
+export interface EmojiReactionsType{
   msgId: number,
   emoji:string
 }
 
 export interface RepliedToMessageType{
-  chatID:string|undefined,
+  chatID:number|undefined,
   msgId: number,
   message:string
 }

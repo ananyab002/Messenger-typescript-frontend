@@ -4,12 +4,15 @@ import App from './App.tsx'
 import './index.css'
 import { ChatMessagesContextProvider } from './context/ChatMessagesContext.tsx'
 import { AuthContextProvider } from './context/AuthContext.tsx'
+import { ChatIdContextProvider } from './context/ChatIdContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthContextProvider>
       <ChatMessagesContextProvider>
-        <App />
+        <ChatIdContextProvider>
+          <App />
+        </ChatIdContextProvider>
       </ChatMessagesContextProvider>
     </AuthContextProvider>
   </StrictMode>,

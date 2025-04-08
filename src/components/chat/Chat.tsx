@@ -1,21 +1,22 @@
 
 import ChatDialog from "./chatDialog/ChatDialog";
 import ContactInfo from "./contactInfo/ContactInfo";
-import { useChat } from "../../context/ChatMessagesContext";
-import { useParams } from "react-router-dom";
 import ChatPrompt from "./chatPrompt/ChatPrompt";
 import "./chat.scss";
+import { useChat } from "../../hooks/useChat";
+import { useChatId } from "../../hooks/useChatId";
 
 const Chat = () => {
   const { allMessages } = useChat();
-  const { chatID } = useParams<{ chatID: string }>();
+  const { chatId } = useChatId();
+
   return (
     <div className="chatComponent">
-      {chatID && allMessages[chatID] ? (
+      {chatId && allMessages ? (
         <div className="chat-container">
           <ContactInfo />
-          <ChatDialog />
-          <ChatPrompt chatID={chatID} />
+          <ChatDialog chatID={chatId} />
+          <ChatPrompt chatID={chatId} />
         </div>
       ) : (
         <div className="info">Please select a friend to chat.</div>

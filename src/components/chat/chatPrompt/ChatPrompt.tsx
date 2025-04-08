@@ -15,12 +15,12 @@ interface ChatPromptType {
   message: string
 }
 interface PromptDraftMessage {
-  promptChatID: string | undefined,
+  promptChatID: number | undefined,
   promptMessage: string
 }
 
 type ChatPromptPropType = {
-  chatID: string
+  chatID: number
 }
 const ChatPrompt = ({ chatID }: ChatPromptPropType) => {
   const { register, handleSubmit, setValue, reset, getValues } = useForm<ChatPromptType>();

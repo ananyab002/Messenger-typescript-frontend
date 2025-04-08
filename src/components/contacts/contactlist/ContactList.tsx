@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useChat } from "../../../context/ChatMessagesContext";
+import { useState } from "react";
 import "./contactList.scss";
 import { useNavigate } from "react-router-dom";
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -9,6 +8,8 @@ import { useContact } from "../../../hooks/useContacts";
 import { ContactListType } from "../../../types/type";
 import { useLogin } from "../../../hooks/useLogin";
 import { useSelectedContact } from "../../../hooks/useSelectedContact";
+import { useChat } from "../../../hooks/useChat";
+import { useChatId } from "../../../hooks/useChatId";
 
 
 /**
@@ -23,6 +24,7 @@ const ContactList = () => {
   const [addContactDialog, setAddContactDialog] = useState<boolean>(false);
   const { currentUser } = useLogin();
   const navigate = useNavigate();
+  const { updateChatId } = useChatId();
 
   console.log(contactList);
 
@@ -35,6 +37,7 @@ const ContactList = () => {
       const actualChatId = await fetchAllMessages(userId, contact.contactId);
       updateSelectedContact(contact);
       console.log(selectedContact, actualChatId);
+      updateChatId(actualChatId);
       navigate(`/Messenger-typescript-frontend/messenger/` + actualChatId);
 
     } catch (error) {
@@ -43,17 +46,17 @@ const ContactList = () => {
   };
 
 
-  // const handleSearch = () => {
-  //   const searchContactList = contactList.filter(item => searchText && item.contactName.toLowerCase().includes(searchText.toLowerCase()));
-  //   if (searchContactList) {
-  //     const remainingContactList = contactList.filter(item => item.contactId !== searchContactList[0].contactId);
-  //     const updatedContactList = [...searchContactList, ...remainingContactList];
-  //     updateContactList(updatedContactList);
-  //     updateSelectedContact(searchContactList[0]);
-  //     getMessages(searchContactList[0]);
-  //   }
-  //   console.log(searchContactList);
-  // }
+  const handleSearch = () => {
+    const searchContactList = contactList.filter(item => searchText && item.contactName.toLowerCase().includes(searchText.toLowerCase()));
+    // if (searchContactList) {
+    //   const remainingContactList = contactList.filter(item => item.contactId !== searchContactList[0].contactId);
+    //   const updatedContactList = [...searchContactList, ...remainingContactList];
+    //   updateContactList(updatedContactList);
+    //   updateSelectedContact(searchContactList[0]);
+    //   getMessages(searchContactList[0]);
+    // }
+    console.log(searchContactList);
+  }
 
   const handleAddContactDialog = (contactData?: ContactListType) => {
     if (contactData) {
@@ -69,7 +72,7 @@ const ContactList = () => {
         <input type="text" placeholder="Add or search"
           onChange={(e) => setSearchText(e.target.value)} />
         <div className="search">
-          {/* <SearchIcon className="searchContact" onClick={handleSearch} /> */}
+          <SearchIcon className="searchContact" onClick={handleSearch} />
           <AddBoxIcon className="addContact" onClick={() => setAddContactDialog(true)} />
         </div>
       </div>
