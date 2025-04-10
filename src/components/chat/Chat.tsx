@@ -15,8 +15,8 @@ const Chat = () => {
       {chatId && allMessages ? (
         <div className="chat-container">
           <ContactInfo />
-          <ChatDialog chatID={chatId} />
-          <ChatPrompt chatID={chatId} />
+          <ChatDialog />
+          <ChatPrompt />
         </div>
       ) : (
         <div className="info">Please select a friend to chat.</div>

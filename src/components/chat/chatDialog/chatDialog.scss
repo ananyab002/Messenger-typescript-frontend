@@ -16,54 +16,55 @@
     &.user {
       align-self: flex-end;
       margin-left: auto;
-      .text-container {
-        .replyChatDiv {
-          word-wrap: break-word;
-          border-left: 2px solid cadetblue;
-          border-radius: 5px;
-          padding: 20px;
-          height: auto;
-          border-bottom: 1px solid #333;
-          border-top: 1px solid #333;
+    }
+    .text-container {
+      .replyChatDiv {
+        word-wrap: break-word;
+        border-left: 2px solid cadetblue;
+        border-radius: 5px;
+        padding: 20px;
+        height: auto;
+        border-bottom: 1px solid #333;
+        border-top: 1px solid #333;
+        border-right: 1px solid #333;
+        p {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .reply-texts {
           p {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            padding: 20px;
+            background-color: rgb(81, 141, 164);
+            border-radius: 10px;
+            overflow-wrap: anywhere;
           }
-          .reply-texts {
-            p {
-              padding: 20px;
-              background-color: rgb(81, 141, 164);
-              border-radius: 10px;
-              overflow-wrap: anywhere;
-            }
-            .dateTime {
-              display: flex;
-              justify-content: center;
-              gap: 10px;
-              span {
-                font-size: 12px;
-                font-weight: 100;
-              }
+          .dateTime {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            span {
+              font-size: 12px;
+              font-weight: 100;
             }
           }
         }
       }
-      .texts {
-        cursor: pointer;
-        p {
-          background-color: rgb(81, 141, 164);
-          overflow-wrap: anywhere;
-        }
-        .dateTime {
-          display: flex;
-          gap: 10px;
-          span {
-            font-size: 12px;
-            font-weight: 100;
-          }
+    }
+    .texts {
+      cursor: pointer;
+      p {
+        background-color: rgb(81, 141, 164);
+        overflow-wrap: anywhere;
+      }
+      .dateTime {
+        display: flex;
+        gap: 10px;
+        span {
+          font-size: 12px;
+          font-weight: 100;
         }
       }
     }

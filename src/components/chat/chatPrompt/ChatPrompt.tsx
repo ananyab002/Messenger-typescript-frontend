@@ -6,6 +6,8 @@ import "./chatPrompt.scss";
 import { useLogin } from "../../../hooks/useLogin";
 import useWebSocket from "../../../hooks/useWebSocket";
 import { useSelectedContact } from "../../../hooks/useSelectedContact";
+import { useChatId } from "../../../hooks/useChatId";
+import { useChat } from "../../../hooks/useChat";
 
 /**
  *  Handles the input and submission of new chat messages.
@@ -19,24 +21,23 @@ interface PromptDraftMessage {
   promptMessage: string
 }
 
-type ChatPromptPropType = {
-  chatID: number
-}
-const ChatPrompt = ({ chatID }: ChatPromptPropType) => {
+const ChatPrompt = () => {
   const { register, handleSubmit, setValue, reset, getValues } = useForm<ChatPromptType>();
   const [openEmoji, setOpenEmoji] = useState(false);
   const [promtDraftMessages, setPromptDraftMessages] = useState<PromptDraftMessage[]>([]);
   const { currentUser } = useLogin();
-  const { sendMessage } = useWebSocket(chatID);
+  const { sendMessage } = useWebSocket();
   const { selectedContact } = useSelectedContact();
+  const { chatId } = useChatId()
+  const { replyMessage } = useChat();
 
   useEffect(() => {
     getDraftMessages()
-  }, [chatID]);
+  }, [chatId]);
 
   const getDraftMessages = () => {
-    console.log("chatId", chatID)
-    const promptMessageValue = promtDraftMessages.find(draftMsg => chatID === draftMsg.promptChatID);
+    console.log("chatId", chatId)
+    const promptMessageValue = promtDraftMessages.find(draftMsg => chatId === draftMsg.promptChatID);
     if (promptMessageValue) {
       setValue("message", promptMessageValue.promptMessage);
     }
@@ -45,7 +46,7 @@ const ChatPrompt = ({ chatID }: ChatPromptPropType) => {
   }
 
   const handleSendMessage: SubmitHandler<ChatPromptType> = async (data) => {
-    const updatedPromptDraft = promtDraftMessages.filter(item => item.promptChatID != chatID && item.promptMessage != data.message);
+    const updatedPromptDraft = promtDraftMessages.filter(item => item.promptChatID != chatId && item.promptMessage != data.message);
     const userId = currentUser?.userId;
     const token = localStorage.getItem("authToken");
     const receiverId = selectedContact?.contactId;
@@ -53,7 +54,7 @@ const ChatPrompt = ({ chatID }: ChatPromptPropType) => {
       return;
     if (!token)
       return;
-    if (!chatID)
+    if (!chatId)
       return;
     if (!receiverId)
       return;
@@ -64,21 +65,7 @@ const ChatPrompt = ({ chatID }: ChatPromptPropType) => {
       return;
     }
 
-    // // if (replyMessage) {
-    // //   messageObject = {
-    // //     // id 1 is for the user
-    // //     id: 1,
-    // //     message: data.message,
-    // //     time: formatTime(new Date()),
-    // //     date: getFormattedDate(new Date()),
-    // //     msgId: 10,
-    // //     repliedToMsgId: replyMessage.msgId,
-    // //     repliedToMessage: replyMessage.message
-    // //   };
-    // //   updateAllMessages(messageObject, chatID || "");
-    // // }
-    // // else {
-    sendMessage(data.message, userId, receiverId);
+    sendMessage(data.message, userId, receiverId, replyMessage?.repliedToMsgId);
     reset();
   };
 
@@ -102,17 +89,17 @@ const ChatPrompt = ({ chatID }: ChatPromptPropType) => {
   const handlePromptInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
     setPromptDraftMessages(prev => {
-      const findChatID = prev.find(draftMsg => chatID === draftMsg.promptChatID);
+      const findChatID = prev.find(draftMsg => chatId === draftMsg.promptChatID);
       if (findChatID) {
         return prev.map(draftMsg => {
-          if (chatID === draftMsg.promptChatID) {
+          if (chatId === draftMsg.promptChatID) {
             return { ...draftMsg, promptMessage: inputValue };
           }
           return draftMsg;
         })
       }
       else {
-        return [...prev, { promptChatID: chatID, promptMessage: inputValue }];
+        return [...prev, { promptChatID: chatId, promptMessage: inputValue }];
       }
     });
 

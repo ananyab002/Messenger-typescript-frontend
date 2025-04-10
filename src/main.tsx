@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -7,7 +7,7 @@ import { AuthContextProvider } from './context/AuthContext.tsx'
 import { ChatIdContextProvider } from './context/ChatIdContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  <React.StrictMode>
     <AuthContextProvider>
       <ChatMessagesContextProvider>
         <ChatIdContextProvider>
@@ -15,5 +15,5 @@ createRoot(document.getElementById('root')!).render(
         </ChatIdContextProvider>
       </ChatMessagesContextProvider>
     </AuthContextProvider>
-  </StrictMode>,
+  </React.StrictMode>,
 )

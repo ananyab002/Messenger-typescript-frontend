@@ -8,23 +8,22 @@ import { EmojiReactions } from "./emojiReactions/EmojiReactions";
 import { DateTimeDiv } from "./dateTimeDiv/DateTimeDiv";
 import { useChat } from "../../../hooks/useChat";
 import useWebSocket from "../../../hooks/useWebSocket";
+import { useChatId } from "../../../hooks/useChatId";
 
 
 /**
  * ChatDialog component renders the chat interface displaying messages.
  * It fetches messages from the ChatMessagesContext based on the chatID
  */
-type ChatDialogPropType = {
-  chatID: number
-}
-const ChatDialog = ({ chatID }: ChatDialogPropType) => {
+const ChatDialog = () => {
 
   const centerRef = useRef<HTMLDivElement | null>(null);
   const { allMessages } = useChat() ?? {};
   const [deleteMsgId, setDeleteMsgId] = useState<number>();
   const { replyMessage, updateReplyMessages } = useChat();
   const { currentUser } = useLogin();
-  const { sendDeleteMessage, sendMessageEmojiReaction } = useWebSocket(chatID);
+  const { sendDeleteMessage, sendMessageEmojiReaction } = useWebSocket();
+  const { chatId } = useChatId();
 
 
   /**
@@ -46,10 +45,9 @@ const ChatDialog = ({ chatID }: ChatDialogPropType) => {
   const handleReactions = (msgId: number, emoji: string) => {
     sendMessageEmojiReaction(msgId, emoji);
   }
-  const handleReplyMessage = (msgId: number, message: string): React.MouseEventHandler<HTMLDivElement> => () => {
-    if (chatID)
-      updateReplyMessages("open", message, chatID, msgId);
-    console.log(msgId, replyMessage)
+  const handleReplyMessage = (repliedToMsgId: number, repliedToMsgContent: string): React.MouseEventHandler<HTMLDivElement> => () => {
+    if (chatId)
+      updateReplyMessages("open", repliedToMsgContent, chatId, repliedToMsgId);
   }
 
   const handleCancelReply = () => {
@@ -68,7 +66,7 @@ const ChatDialog = ({ chatID }: ChatDialogPropType) => {
             {message.repliedToMsgId ? (
               <div className="text-container">
                 <div className="replyChatDiv">
-                  <p> {message.repliedToMessage}</p>
+                  <p> {message.repliedToMsgContent}</p>
                   <div className="reply-texts" onDoubleClick={handleReplyMessage(message.msgId, message.content)}>
                     <p>{message.content}</p>
                     <DateTimeDiv message={message} />
@@ -81,7 +79,9 @@ const ChatDialog = ({ chatID }: ChatDialogPropType) => {
                 <p>{message.content}</p>
                 <DateTimeDiv message={message} />
               </div>)}
+
             <EmojiReactions message={message} reactions={handleReactions} />
+
             < div className="deleteMsg">
               {message.senderId === currentUser?.userId && message.msgId === deleteMsgId &&
                 <DeleteIcon onClick={handleDeleteMsg(message.msgId)} sx={{ color: "red", fontSize: "20px" }} />}
@@ -89,12 +89,12 @@ const ChatDialog = ({ chatID }: ChatDialogPropType) => {
           </div>
         ))
       }
-      {replyMessage?.msgId && chatID && replyMessage.chatID === chatID && (<div className="replyDiv">
+      {replyMessage?.repliedToMsgId && chatId && replyMessage.chatID === chatId && (<div className="replyDiv">
         <div className="cancelReply" onClick={handleCancelReply}>
           <CancelIcon />
         </div>
         <div className="replyMessage">
-          <p>{replyMessage.message}</p>
+          <p>{replyMessage.repliedToMsgContent}</p>
         </div>
       </div>)}
     </div >

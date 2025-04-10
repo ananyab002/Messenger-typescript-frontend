@@ -7,7 +7,7 @@ export interface MessageType {
   senderId: number,
   emojiReaction:string,
   repliedToMsgId?: number
-  repliedToMessage?:string
+  repliedToMsgContent?:string
 }
 
 export interface EmojiReactionsType{
@@ -17,8 +17,8 @@ export interface EmojiReactionsType{
 
 export interface RepliedToMessageType{
   chatID:number|undefined,
-  msgId: number,
-  message:string
+  repliedToMsgId: number,
+  repliedToMsgContent:string
 }
 
 

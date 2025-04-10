@@ -2,10 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { ContactListType } from '../types/type';
 import { useLogin } from './useLogin';
 import { contactApi } from '../api/contactsApi';
-import { Client, Message } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
-
-const SOCKET_URL = "http://localhost:8080/message";
+import { subscribe } from '../api/connectWebSocket';
 
 export const useContact = () => {
     const [contactList, setContactList] = useState<ContactListType[]>([]);
@@ -50,34 +47,12 @@ export const useContact = () => {
 
         fetchInitialContacts();
 
-        const stompClient = new Client({
-            webSocketFactory: () => {
-                return new SockJS(`${SOCKET_URL}?token=${token}`);
-            },
-            reconnectDelay: 5000
-        });
+        const unsubscribe = subscribe(
+            `/topic/contacts/${currentUser.userId}`,
+            updateContactList
+        );
 
-        stompClient.onConnect = () => {
-            console.log('WebSocket connected');
-
-            stompClient.subscribe(`/topic/contacts/${currentUser.userId}`, (message: Message) => {
-                const data = JSON.parse(message.body);
-                console.log(data);
-                updateContactList(data);
-            });
-        };
-
-        stompClient.onDisconnect = () => {
-            console.log('WebSocket disconnected');
-        };
-
-        stompClient.activate();
-
-        return () => {
-            if (stompClient.active) {
-                stompClient.deactivate();
-            }
-        };
+        return unsubscribe;
     }, [currentUser, token, fetchInitialContacts, updateContactList]);
 
     return {

@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useCallback, useState } from "react";
 import { MessageType, RepliedToMessageType } from "../types/type";
 import api from "../api/globalApi";
 
@@ -48,29 +48,27 @@ export const ChatMessagesContextProvider = ({ children }: Props) => {
     }
   }
 
-  const updateAllMessages = async (recievedMessage: MessageType) => {
+  const updateAllMessages = useCallback((recievedMessage: MessageType) => {
     console.log(recievedMessage)
-    setAllMessages(prev => {
-      const existingMsg = prev.some(msg => msg.msgId === recievedMessage.msgId);
-      if (existingMsg)
-        return prev;
-      return [...prev, recievedMessage];
-    })
-  };
+    setAllMessages(prev =>
+      [...prev, recievedMessage]
+    )
+    updateReplyMessages("cancel")
+  }, []);
 
-  const updateMessageReactions = (msgId: number, emojiReaction: string) => {
+  const updateMessageReactions = useCallback((msgId: number, emojiReaction: string) => {
     setAllMessages(prevMessages =>
       prevMessages.map(msg => msg.msgId == msgId ? { ...msg, emojiReaction: emojiReaction } : msg)
     );
-  }
+  }, [])
 
   const deletedMessages = (msgId: number) => {
     setAllMessages(prevMessages => prevMessages.filter(msg => msg.msgId !== msgId));
   }
 
-  const updateReplyMessages = async (action: string, message?: string, chatID?: number, msgId?: number) => {
-    if (action === "open" && message && chatID && msgId) {
-      setReplyMessage({ message, chatID, msgId });
+  const updateReplyMessages = async (action: string, repliedToMsgContent?: string, chatID?: number, repliedToMsgId?: number) => {
+    if (action === "open" && repliedToMsgContent && chatID && repliedToMsgId) {
+      setReplyMessage({ repliedToMsgContent, chatID, repliedToMsgId });
       console.log("Open reply", replyMessage);
     }
     else if (action === "cancel") {
